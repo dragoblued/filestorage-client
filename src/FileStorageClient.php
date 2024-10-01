@@ -1,5 +1,5 @@
 <?php
-namespace common\services\tabaeva\src;
+namespace Filestorageclient;
 
 use common\services\tabaeva\src\storages\S3FileStorage;
 

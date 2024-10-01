@@ -1,6 +1,6 @@
 <?php
 
-namespace common\services\tabaeva\src\interfaces;
+namespace Filestorageclient\Storages;
 
 
 /**
