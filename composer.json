@@ -1,0 +1,19 @@
+{
+    "name": "dragoblued/filestorageclient",
+    "autoload": {
+        "psr-4": {
+            "Dragoblued\\Filestorageclient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Tabaeva Natalia",
+            "email": "qwemee@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "gaufrette/aws-s3-adapter": "^0.4.0",
+        "gaufrette/extras": "^0.1.0"
+    }
+}
