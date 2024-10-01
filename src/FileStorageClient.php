@@ -1,7 +1,7 @@
 <?php
 namespace Dragoblued\Filestorageclient;
 
-use common\services\tabaeva\src\storages\S3FileStorage;
+use Dragoblued\Filestorageclient\Storages\S3FileStorage;
 
 class FileStorageClient
 {

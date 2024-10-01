@@ -8,7 +8,7 @@ use Gaufrette\Filesystem;
 use Gaufrette\FilesystemInterface;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
-use common\services\tabaeva\src\interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\Interfaces\FileStorageInterface;
 use Throwable;
 
 class S3FileStorage implements FileStorageInterface
