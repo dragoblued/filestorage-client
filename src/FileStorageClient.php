@@ -1,7 +1,7 @@
 <?php
 namespace Dragoblued\Filestorageclient;
 
-use Dragoblued\Filestorageclient\Storages\S3FileStorage;
+use Dragoblued\Filestorageclient\storages\S3FileStorage;
 
 class FileStorageClient
 {

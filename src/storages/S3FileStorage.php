@@ -1,6 +1,6 @@
 <?php
 
-namespace Dragoblued\Filestorageclient\Storages;
+namespace Dragoblued\Filestorageclient\storages;
 
 use Aws\S3\S3Client;
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
@@ -8,7 +8,7 @@ use Gaufrette\Filesystem;
 use Gaufrette\FilesystemInterface;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
-use Dragoblued\Filestorageclient\Interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
 use Throwable;
 
 class S3FileStorage implements FileStorageInterface
