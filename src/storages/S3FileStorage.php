@@ -1,6 +1,6 @@
 <?php
 
-namespace Filestorageclient\storages;
+namespace Dragoblued\FileStorageClient\Storages;
 
 use Aws\S3\S3Client;
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
