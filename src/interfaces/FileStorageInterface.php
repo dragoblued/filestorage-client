@@ -1,6 +1,6 @@
 <?php
 
-namespace Dragoblued\FileStorageClient\Interfaces;
+namespace Dragoblued\Filestorageclient\Interfaces;
 
 
 /**
