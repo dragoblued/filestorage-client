@@ -4,17 +4,18 @@ namespace Dragoblued\Filestorageclient\interfaces;
 
 
 /**
- * Интерфейс клиента хранилища файлов.
+ * Interface FileStorageInterface
  */
 interface FileStorageInterface
 {
     /**
      * @param string $name
-     * @param string $fileContent
+     * @param string $tmp
+     * @param string $path
      *
      * @return void
      */
-    public function upload(string $name, string $fileContent): void;
+    public function upload(string $name, string $tmp, string $path = ''): void;
 
     /**
      * @param string $name
@@ -22,11 +23,4 @@ interface FileStorageInterface
      * @return void
      */
     public function delete(string $name): void;
-
-    /**
-     * @param string $name
-     *
-     *
-     */
-    public function get(string $name);
 }

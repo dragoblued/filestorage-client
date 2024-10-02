@@ -11,6 +11,19 @@ use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
 use Throwable;
 
+
+use Aws\Exception\AwsException;
+use Aws\S3\S3Client;
+use Exception;
+use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
+use Gaufrette\File;
+use Gaufrette\Filesystem;
+use Gaufrette\FilesystemInterface;
+use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
+use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
+use common\services\tabaeva\interfaces\FileStorageInterface;
+use Throwable;
+
 class S3FileStorage implements FileStorageInterface
 {
     private FilesystemInterface $filesystem;
@@ -21,19 +34,21 @@ class S3FileStorage implements FileStorageInterface
     private string $bucket;
     private string $rootDirectory;
 
-    public function __construct(
-        array $config = []
-    )
+    public function __construct(array $config = [])
     {
-        $this->s3Client = new S3Client([
-            'version' => 'latest',
-            'region'  => $config['S3_REGION'] ?: '',
-            'credentials' => [
-                'key'    => $config['S3_KEY'] ?: '',
-                'secret' => $config['S3_SECRET'] ?: '',
-            ],
-            'endpoint' => $config['S3_ENDPOINT'] ?: '',
-        ]);
+        try {
+            $this->s3Client = new S3Client([
+                'version' => 'latest',
+                'region' => $config['S3_REGION'] ?: '',
+                'credentials' => [
+                    'key' => $config['S3_KEY'] ?: '',
+                    'secret' => $config['S3_SECRET'] ?: '',
+                ],
+                'endpoint' => $config['S3_ENDPOINT'] ?: '',
+            ]);
+        } catch (AwsException $e) {
+            throw new Exception("Error connecting to S3: " . $e->getMessage());
+        }
         $this->bucket = $config['S3_BUCKET'];
         $this->rootDirectory = $config['S3_ROOT_DIRECTORY'] ?: '';
         $this->awsS3Adapter = new AwsS3Adapter($this->s3Client, $this->bucket, [
@@ -42,23 +57,31 @@ class S3FileStorage implements FileStorageInterface
             'acl' => 'public-read'
         ]);
         $this->filesystem = new Filesystem($this->awsS3Adapter);
-
-        // Создаем разрешающий резолвер
         $this->resolver = new AwsS3PublicUrlResolver($this->s3Client, $this->bucket, $this->rootDirectory);
-
-        // Создаем ResolvableFilesystem
         $this->resolvableFilesystem = new ResolvableFilesystem($this->filesystem, $this->resolver);
     }
 
-    public function upload(string $name, string $fileContent): void
+    /**
+     * @param string $name
+     * @param string $tmp
+     * @param string $path
+     *
+     * @return void
+     */
+    public function upload(string $name, string $tmp, string $path = null): void
     {
         try {
-            $this->filesystem->write($name, $fileContent);
+            $this->filesystem->write($name, file_get_contents($tmp));
         } catch (Throwable $e) {
             throw $e;
         }
     }
 
+    /**
+     * @param string $name
+     *
+     * @return void
+     */
     public function delete(string $name): void
     {
         try {
@@ -68,15 +91,28 @@ class S3FileStorage implements FileStorageInterface
         }
     }
 
-    public function get(string $name)
+    /**
+     * @param string $name
+     *
+     * @return File
+     */
+    public function get(string $name): ?File
     {
         try {
-            return $this->filesystem->get($name);
+            if ($this->filesystem->has($name)) {
+                return $this->filesystem->get($name);
+            }
+            return null;
         } catch (Throwable $e) {
             throw $e;
         }
     }
 
+    /**
+     * @param string $name
+     *
+     * @return int
+     */
     public function size(string $name): int
     {
         try {
@@ -86,19 +122,15 @@ class S3FileStorage implements FileStorageInterface
         }
     }
 
-    public function has(string $name): bool
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public function url(string $name): string
     {
         try {
-            return $this->filesystem->has($name);
-        } catch (Throwable $e) {
-            throw $e;
-        }
-    }
-
-    public function resolve(string $key): string
-    {
-        try {
-            return $this->filesystem->resolve($key);
+            return $this->s3Client->getObjectUrl($this->bucket, $name);
         } catch (Throwable $e) {
             throw $e;
         }

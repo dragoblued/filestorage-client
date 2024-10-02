@@ -2,6 +2,8 @@
 namespace Dragoblued\Filestorageclient;
 
 use Dragoblued\Filestorageclient\storages\S3FileStorage;
+use Dragoblued\Filestorageclient\storages\LocalFileStorage;
+use Exception;
 
 class FileStorageClient
 {
@@ -25,17 +27,16 @@ class FileStorageClient
                     'S3_ROOT_DIRECTORY' => getenv('S3_ROOT_DIRECTORY'),
                 ]);
             default:
-                return null;
+            return new LocalFileStorage($config);
         }
     }
 
     public function __call($methodName, $arguments)
     {
         if (method_exists($this->fileStorage, $methodName)) {
-            $result = call_user_func_array([$this->fileStorage, $methodName], $arguments);
-            echo $result;
+            return call_user_func_array([$this->fileStorage, $methodName], $arguments);
         } else {
-            echo "Метод '$methodName' не существует.";
+            throw new Exception('Method'.$methodName.'not found');
         }
     }
 }
