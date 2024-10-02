@@ -24,6 +24,9 @@ use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use common\services\tabaeva\interfaces\FileStorageInterface;
 use Throwable;
 
+/**
+ * Class S3FileStorage
+ */
 class S3FileStorage implements FileStorageInterface
 {
     private FilesystemInterface $filesystem;

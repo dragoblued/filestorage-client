@@ -5,6 +5,9 @@ use Dragoblued\Filestorageclient\storages\S3FileStorage;
 use Dragoblued\Filestorageclient\storages\LocalFileStorage;
 use Exception;
 
+/**
+ * Class FileStorageClient
+ */
 class FileStorageClient
 {
     private $fileStorage;

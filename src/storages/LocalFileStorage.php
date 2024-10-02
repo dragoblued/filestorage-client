@@ -5,6 +5,9 @@ namespace Dragoblued\Filestorageclient\storages;
 use common\services\tabaeva\interfaces\FileStorageInterface;
 use Exception;
 
+/**
+ * Class LocalFileStorage
+ */
 class LocalFileStorage implements FileStorageInterface
 {
     private string $attachmentSystemPath;
