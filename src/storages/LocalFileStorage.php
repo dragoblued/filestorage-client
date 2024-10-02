@@ -2,7 +2,7 @@
 
 namespace Dragoblued\Filestorageclient\storages;
 
-use common\services\tabaeva\interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
 use Exception;
 
 /**
