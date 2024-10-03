@@ -1,11 +1,11 @@
-#Filestorage Client
+Filestorage Client
 Клиент предназначен для работы с файловыми хранилищами, включая использование S3
 
 #Установка пакета
 composer require fixprice/filestorage-client
 
-#Пример использования
-#Сохранение файла в s3
+Пример использования
+Сохранение файла в s3
 ```
 use Fixprice\FilestorageClient\FilestorageClient;
 use Fixprice\FilestorageClient\Enums\StorageTypeEnum;
@@ -21,7 +21,7 @@ $fileStorageClient->fileStorage->upload($file->name, $file->tempName);
 5. url: получение ссылки на файл в S3.
 6. clearBucket: очистка всего содержимого бакета.
 
-#Сохранение файла в локальном хранилище
+Сохранение файла в локальном хранилище
 ```
 use Fixprice\FilestorageClient\FilestorageClient;
 use Fixprice\FilestorageClient\Enums\StorageTypeEnum;
