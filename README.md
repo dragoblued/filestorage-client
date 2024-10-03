@@ -1,10 +1,11 @@
-Filestorage Client
+# Filestorage Client
+
 Клиент предназначен для работы с файловыми хранилищами, включая использование S3
 
-#Установка пакета
+# Установка пакета
 composer require fixprice/filestorage-client
 
-Пример использования
+# Пример использования
 Сохранение файла в s3
 ```
 use Fixprice\FilestorageClient\FilestorageClient;
