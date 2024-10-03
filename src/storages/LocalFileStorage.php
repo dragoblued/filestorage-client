@@ -2,8 +2,9 @@
 
 namespace Dragoblued\Filestorageclient\storages;
 
+use Dragoblued\Filestorageclient\exceptions\LocalFileStorageException;
 use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
-use Exception;
+use Throwable;
 
 /**
  * Class LocalFileStorage
@@ -11,7 +12,6 @@ use Exception;
 class LocalFileStorage implements FileStorageInterface
 {
     private string $attachmentSystemPath;
-    private string $attachmentPath;
 
     /**
      * @param array $config
@@ -19,7 +19,6 @@ class LocalFileStorage implements FileStorageInterface
     public function __construct(array $config = [])
     {
         $this->attachmentSystemPath = $config['attachmentSystemPath'];
-        $this->attachmentPath = $config['attachmentPath'];
     }
 
     /**
@@ -31,14 +30,14 @@ class LocalFileStorage implements FileStorageInterface
      */
     public function upload(string $name, string $tmp, string $path = ''): void
     {
-        $systemPath = $this->attachmentSystemPath.$path;
+        $systemPath = $this->attachmentSystemPath . $path;
         if (!file_exists($systemPath)) {
             if (!mkdir($systemPath, 0777, true)) {
-                throw new Exception('No write permission');
+                throw new LocalFileStorageException('No write permission');
             }
         }
         if (!file_put_contents($systemPath . $name, $tmp)) {
-            throw new Exception('Unable to write file');
+            throw new LocalFileStorageException('Unable to write file');
         }
     }
 
@@ -50,9 +49,13 @@ class LocalFileStorage implements FileStorageInterface
      */
     public function delete(string $name, string $path = ''): void
     {
-        $systemPath = $this->attachmentSystemPath.$path.$name;
-        if (file_exists($systemPath)) {
-            unlink($systemPath);
+        $systemPath = $this->attachmentSystemPath . $path . $name;
+        try {
+            if (file_exists($systemPath)) {
+                unlink($systemPath);
+            }
+        } catch (Throwable $e) {
+            throw new LocalFileStorageException('Unable to delete file: ' . $e->getMessage());
         }
     }
 
@@ -64,15 +67,5 @@ class LocalFileStorage implements FileStorageInterface
     public function setAttachmentSystemPath(string $attachmentSystemPath): void
     {
         $this->attachmentSystemPath = $attachmentSystemPath;
-    }
-
-    /**
-     * @param string $attachmentPath
-     *
-     * @return void
-     */
-    public function setAttachmentPath(string $attachmentPath): void
-    {
-        $this->attachmentPath = $attachmentPath;
     }
 }

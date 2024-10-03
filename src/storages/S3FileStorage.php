@@ -4,7 +4,6 @@ namespace Dragoblued\Filestorageclient\storages;
 
 use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
-use Exception;
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
@@ -12,6 +11,7 @@ use Gaufrette\FilesystemInterface;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\exceptions\S3StorageException;
 use Throwable;
 
 /**
@@ -27,6 +27,9 @@ class S3FileStorage implements FileStorageInterface
     private string $bucket;
     private string $rootDirectory;
 
+    /**
+     * @param array $config
+     */
     public function __construct(array $config = [])
     {
         try {
@@ -40,7 +43,7 @@ class S3FileStorage implements FileStorageInterface
                 'endpoint' => $config['S3_ENDPOINT'] ?: '',
             ]);
         } catch (AwsException $e) {
-            throw new Exception("Error connecting to S3: " . $e->getMessage());
+            throw new S3StorageException("Error connecting to S3: " . $e->getMessage());
         }
         $this->bucket = $config['S3_BUCKET'];
         $this->rootDirectory = $config['S3_ROOT_DIRECTORY'] ?: '';
@@ -66,7 +69,7 @@ class S3FileStorage implements FileStorageInterface
         try {
             $this->filesystem->write($name, file_get_contents($tmp));
         } catch (Throwable $e) {
-            throw $e;
+            throw new S3StorageException('Error uploading file: ' . $e->getMessage());
         }
     }
 
@@ -80,7 +83,7 @@ class S3FileStorage implements FileStorageInterface
         try {
             $this->filesystem->delete($name);
         } catch (Throwable $e) {
-            throw $e;
+            throw new S3StorageException('Error deleting file: ' . $e->getMessage());
         }
     }
 
@@ -97,7 +100,7 @@ class S3FileStorage implements FileStorageInterface
             }
             return null;
         } catch (Throwable $e) {
-            throw $e;
+            throw new S3StorageException('Error getting file: ' . $e->getMessage());
         }
     }
 
@@ -111,7 +114,7 @@ class S3FileStorage implements FileStorageInterface
         try {
             return $this->filesystem->size($name);
         } catch (Throwable $e) {
-            throw $e;
+            throw new S3StorageException('Error getting size: ' . $e->getMessage());
         }
     }
 
@@ -125,7 +128,7 @@ class S3FileStorage implements FileStorageInterface
         try {
             return $this->s3Client->getObjectUrl($this->bucket, $name);
         } catch (Throwable $e) {
-            throw $e;
+            throw new S3StorageException('Error getting url: ' . $e->getMessage());
         }
     }
 
@@ -147,7 +150,7 @@ class S3FileStorage implements FileStorageInterface
                 $this->s3Client->deleteObject(['Bucket' => $this->bucket, 'Key' => $staleObject['Key']]);
             }
         } catch (Throwable $e) {
-            throw $e;
+            throw new S3StorageException('Error cleanup bucket: ' . $e->getMessage());
         }
     }
 }
