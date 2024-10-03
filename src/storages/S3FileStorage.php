@@ -10,8 +10,8 @@ use Gaufrette\Filesystem;
 use Gaufrette\FilesystemInterface;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
-use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
-use Dragoblued\Filestorageclient\exceptions\S3StorageException;
+use Dragoblued\Filestorageclient\Interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\Exceptions\S3StorageException;
 use Throwable;
 
 /**

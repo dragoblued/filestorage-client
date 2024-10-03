@@ -1,9 +1,9 @@
 <?php
 
-namespace Dragoblued\Filestorageclient\storages;
+namespace Dragoblued\Filestorageclient\Storages;
 
-use Dragoblued\Filestorageclient\exceptions\LocalFileStorageException;
-use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\Exceptions\LocalFileStorageException;
+use Dragoblued\Filestorageclient\Interfaces\FileStorageInterface;
 use Throwable;
 
 /**

@@ -1,10 +1,10 @@
 <?php
 namespace Dragoblued\Filestorageclient;
 
-use Dragoblued\Filestorageclient\enums\StorageTypeEnum;
-use Dragoblued\Filestorageclient\exceptions\StorageException;
-use Dragoblued\Filestorageclient\storages\S3FileStorage;
-use Dragoblued\Filestorageclient\storages\LocalFileStorage;
+use Dragoblued\Filestorageclient\Enums\StorageTypeEnum;
+use Dragoblued\Filestorageclient\Exceptions\StorageException;
+use Dragoblued\Filestorageclient\Storages\S3FileStorage;
+use Dragoblued\Filestorageclient\Storages\LocalFileStorage;
 
 /**
  * Class FileStorageClient

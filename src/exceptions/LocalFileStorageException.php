@@ -1,6 +1,6 @@
 <?php
 
-namespace Dragoblued\Filestorageclient\exceptions;
+namespace Dragoblued\Filestorageclient\Exceptions;
 
 use Exception;
 

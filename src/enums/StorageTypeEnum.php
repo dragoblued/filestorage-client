@@ -1,6 +1,6 @@
 <?php
 
-namespace Dragoblued\Filestorageclient\enums;
+namespace Dragoblued\Filestorageclient\Enums;
 
 /**
  * Class StorageTypeEnum
