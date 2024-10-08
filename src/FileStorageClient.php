@@ -1,10 +1,10 @@
 <?php
 namespace Dragoblued\Filestorageclient;
 
-use Dragoblued\Filestorageclient\Enums\StorageTypeEnum;
-use Dragoblued\Filestorageclient\Exceptions\StorageException;
-use Dragoblued\Filestorageclient\Storages\S3FileStorage;
-use Dragoblued\Filestorageclient\Storages\LocalFileStorage;
+use Dragoblued\Filestorageclient\enums\StorageTypeEnum;
+use Dragoblued\Filestorageclient\exceptions\StorageException;
+use Dragoblued\Filestorageclient\storages\S3FileStorage;
+use Dragoblued\Filestorageclient\storages\LocalFileStorage;
 
 /**
  * Class FileStorageClient
@@ -30,14 +30,7 @@ class FileStorageClient
     {
         switch ($type) {
             case StorageTypeEnum::S3:
-                return new S3FileStorage($config ?: [
-                    'S3_REGION' => getenv('S3_REGION'),
-                    'S3_KEY' => getenv('S3_KEY'),
-                    'S3_SECRET' => getenv('S3_SECRET'),
-                    'S3_ENDPOINT' => getenv('S3_ENDPOINT'),
-                    'S3_BUCKET' => getenv('S3_BUCKET'),
-                    'S3_ROOT_DIRECTORY' => getenv('S3_ROOT_DIRECTORY'),
-                ]);
+                return new S3FileStorage($config);
             case StorageTypeEnum::LOCAL:
                 return new LocalFileStorage($config);
             default:

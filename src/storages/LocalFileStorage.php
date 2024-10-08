@@ -1,9 +1,12 @@
 <?php
 
-namespace Dragoblued\Filestorageclient\Storages;
+namespace Dragoblued\Filestorageclient\storages;
 
-use Dragoblued\Filestorageclient\Exceptions\LocalFileStorageException;
-use Dragoblued\Filestorageclient\Interfaces\FileStorageInterface;
+use Gaufrette\Adapter\Local as LocalAdapter;
+use Gaufrette\Filesystem;
+use Dragoblued\Filestorageclient\exceptions\LocalFileStorageException;
+use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\File;
 use Throwable;
 
 /**
@@ -11,61 +14,47 @@ use Throwable;
  */
 class LocalFileStorage implements FileStorageInterface
 {
-    private string $attachmentSystemPath;
+    private Filesystem $filesystem;
+    private $localAdapter;
 
     /**
      * @param array $config
      */
     public function __construct(array $config = [])
     {
-        $this->attachmentSystemPath = $config['attachmentSystemPath'];
+        $this->localAdapter = new LocalAdapter($config['path']);
+        $this->filesystem = new Filesystem($this->localAdapter);
     }
 
     /**
      * @param string $name
-     * @param string $tmp
-     * @param string $path
+     * @param string $tmpName
      *
      * @return void
      */
-    public function upload(string $name, string $tmp, string $path = ''): void
+    public function upload(string $name, string $tmpName): void
     {
-        $systemPath = $this->attachmentSystemPath . $path;
-        if (!file_exists($systemPath)) {
-            if (!mkdir($systemPath, 0777, true)) {
-                throw new LocalFileStorageException('No write permission');
-            }
-        }
-        if (!file_put_contents($systemPath . $name, $tmp)) {
-            throw new LocalFileStorageException('Unable to write file');
-        }
-    }
-
-    /**
-     * @param string $name
-     * @param string $path
-     *
-     * @return void
-     */
-    public function delete(string $name, string $path = ''): void
-    {
-        $systemPath = $this->attachmentSystemPath . $path . $name;
         try {
-            if (file_exists($systemPath)) {
-                unlink($systemPath);
-            }
+            $this->filesystem->write($name, file_get_contents($tmpName));
         } catch (Throwable $e) {
-            throw new LocalFileStorageException('Unable to delete file: ' . $e->getMessage());
+            throw new LocalFileStorageException('Unable to delete file: ' . $name . ' ' . $e->getMessage(), 0, $e);
         }
     }
 
     /**
-     * @param string $attachmentSystemPath
+     * @param string $name
      *
-     * @return void
+     * @return ?File
      */
-    public function setAttachmentSystemPath(string $attachmentSystemPath): void
+    public function getFile(string $name): ?File
     {
-        $this->attachmentSystemPath = $attachmentSystemPath;
+        try {
+            if ($this->filesystem->has($name)) {
+                return (new File($name, $this->filesystem));
+            }
+            return null;
+        } catch (Throwable $e) {
+            throw new LocalFileStorageException('Error getting file: ' . $e->getMessage(), 0, $e);
+        }
     }
 }

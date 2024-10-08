@@ -1,11 +1,11 @@
 <?php
 
-namespace Dragoblued\Filestorageclient\Exceptions;
+namespace Dragoblued\Filestorageclient\exceptions;
 
 use Exception;
 
 /**
- * Class StorageException
+ * Class LocalFileStorageException
  */
 class LocalFileStorageException extends Exception
 {

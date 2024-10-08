@@ -5,13 +5,11 @@ namespace Dragoblued\Filestorageclient\storages;
 use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
-use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Gaufrette\FilesystemInterface;
-use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
-use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
-use Dragoblued\Filestorageclient\Interfaces\FileStorageInterface;
-use Dragoblued\Filestorageclient\Exceptions\S3StorageException;
+use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
+use Dragoblued\Filestorageclient\exceptions\S3StorageException;
+use Dragoblued\Filestorageclient\File;
 use Throwable;
 
 /**
@@ -22,8 +20,6 @@ class S3FileStorage implements FileStorageInterface
     private FilesystemInterface $filesystem;
     private AwsS3Adapter $awsS3Adapter;
     private S3Client $s3Client;
-    private AwsS3PublicUrlResolver $resolver;
-    private ResolvableFilesystem $resolvableFilesystem;
     private string $bucket;
     private string $rootDirectory;
 
@@ -53,68 +49,37 @@ class S3FileStorage implements FileStorageInterface
             'acl' => 'public-read'
         ]);
         $this->filesystem = new Filesystem($this->awsS3Adapter);
-        $this->resolver = new AwsS3PublicUrlResolver($this->s3Client, $this->bucket, $this->rootDirectory);
-        $this->resolvableFilesystem = new ResolvableFilesystem($this->filesystem, $this->resolver);
     }
 
     /**
      * @param string $name
-     * @param string $tmp
-     * @param string $path
+     * @param string $tmpName
      *
      * @return void
      */
-    public function upload(string $name, string $tmp, string $path = null): void
+    public function upload(string $name, string $tmpName): void
     {
         try {
-            $this->filesystem->write($name, file_get_contents($tmp));
+            $this->filesystem->write($name, file_get_contents($tmpName));
         } catch (Throwable $e) {
-            throw new S3StorageException('Error uploading file: ' . $e->getMessage());
+            throw new S3StorageException('Error uploading file: ' . $name . ' ' . $e->getMessage(), 0, $e);
         }
     }
 
     /**
      * @param string $name
      *
-     * @return void
+     * @return ?File
      */
-    public function delete(string $name): void
-    {
-        try {
-            $this->filesystem->delete($name);
-        } catch (Throwable $e) {
-            throw new S3StorageException('Error deleting file: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return File
-     */
-    public function get(string $name): ?File
+    public function getFile(string $name): ?File
     {
         try {
             if ($this->filesystem->has($name)) {
-                return $this->filesystem->get($name);
+                return (new File($name, $this->filesystem));
             }
             return null;
         } catch (Throwable $e) {
-            throw new S3StorageException('Error getting file: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return int
-     */
-    public function size(string $name): int
-    {
-        try {
-            return $this->filesystem->size($name);
-        } catch (Throwable $e) {
-            throw new S3StorageException('Error getting size: ' . $e->getMessage());
+            throw new S3StorageException('Error getting file: ' . $name . ' ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -123,12 +88,12 @@ class S3FileStorage implements FileStorageInterface
      *
      * @return string
      */
-    public function url(string $name): string
+    public function getUrl(string $name): string
     {
         try {
             return $this->s3Client->getObjectUrl($this->bucket, $name);
         } catch (Throwable $e) {
-            throw new S3StorageException('Error getting url: ' . $e->getMessage());
+            throw new S3StorageException('Error getting url: ' . $name . ' ' . $e->getMessage(), 0, $e);
         }
     }
 

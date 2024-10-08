@@ -1,7 +1,8 @@
 <?php
 
-namespace Dragoblued\Filestorageclient\Interfaces;
+namespace Dragoblued\Filestorageclient\interfaces;
 
+use Dragoblued\Filestorageclient\File;
 
 /**
  * Interface FileStorageInterface
@@ -10,17 +11,16 @@ interface FileStorageInterface
 {
     /**
      * @param string $name
-     * @param string $tmp
-     * @param string $path
+     * @param string $tmpName
      *
      * @return void
      */
-    public function upload(string $name, string $tmp, string $path = ''): void;
+    public function upload(string $name, string $tmpName): void;
 
     /**
      * @param string $name
      *
-     * @return void
+     * @return ?File
      */
-    public function delete(string $name): void;
+    public function getFile(string $name): ?File;
 }
