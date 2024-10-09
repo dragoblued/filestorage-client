@@ -15,15 +15,19 @@ use Throwable;
 class LocalFileStorage implements FileStorageInterface
 {
     private Filesystem $filesystem;
-    private $localAdapter;
+    private LocalAdapter $localAdapter;
 
     /**
      * @param array $config
      */
     public function __construct(array $config = [])
     {
-        $this->localAdapter = new LocalAdapter($config['path']);
-        $this->filesystem = new Filesystem($this->localAdapter);
+        try {
+            $this->localAdapter = new LocalAdapter($config['path']);
+            $this->filesystem = new Filesystem($this->localAdapter);
+        } catch (Throwable $e) {
+            throw new LocalFileStorageException("Error connecting to Local: " . $e->getMessage(), 0, $e);
+        }
     }
 
     /**
@@ -37,7 +41,7 @@ class LocalFileStorage implements FileStorageInterface
         try {
             $this->filesystem->write($name, file_get_contents($tmpName));
         } catch (Throwable $e) {
-            throw new LocalFileStorageException('Unable to delete file: ' . $name . ' ' . $e->getMessage(), 0, $e);
+            throw new LocalFileStorageException('Error uploading file: ' . $name . ' ' . $e->getMessage(), 0, $e);
         }
     }
 

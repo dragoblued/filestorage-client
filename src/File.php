@@ -3,6 +3,8 @@ namespace Dragoblued\Filestorageclient;
 
 use Gaufrette\File as GaufretteFile;
 use Gaufrette\Filesystem;
+use Dragoblued\Filestorageclient\exceptions\FileException;
+use Throwable;
 
 /**
  * Class File
@@ -34,7 +36,7 @@ class File
      */
     public function getContent($metadata = [])
     {
-        return $this->file->getContent();
+        return $this->file->getContent($metadata);
     }
 
     /**
@@ -42,6 +44,10 @@ class File
      */
     public function delete($metadata = []) :bool
     {
-        return $this->file->delete($metadata);
+        try {
+            return $this->file->delete($metadata);
+        } catch (Throwable $e) {
+            throw new FileException("Error to delete file: " . $e->getMessage(), 0, $e);
+        }
     }
 }

@@ -8,11 +8,14 @@ composer require fixprice/filestorage-client
 # Пример использования
 Сохранение файла в s3
 ```
-use Fixprice\FilestorageClient\FilestorageClient;
-use Fixprice\FilestorageClient\Enums\StorageTypeEnum;
+use Fixprice\Dragoblued\Filestorageclient\Dragoblued\Filestorageclient;
+use Fixprice\Dragoblued\Filestorageclient\Enums\StorageTypeEnum;
 
 $fileStorageClient = new FileStorageClient(StorageTypeEnum::S3); //принимает вторым аргументом настройки для S3. По умолчанию эти настройки заполняются из переменных окружения (env)
-$fileStorageClient->fileStorage->upload($file->name, $file->tempName);
+$fileStorageClient->upload($file->name, $file->tempName);
+$fileStorageClient->getUrl($file->name);
+$file = $fileStorageClient->getFile($file->name);
+$file->delete(); //getSize, getContent
 ```
 Описание методов для работы с S3:
 1. upload: загрузка файла в хранилище.
@@ -24,13 +27,15 @@ $fileStorageClient->fileStorage->upload($file->name, $file->tempName);
 
 Сохранение файла в локальном хранилище
 ```
-use Fixprice\FilestorageClient\FilestorageClient;
-use Fixprice\FilestorageClient\Enums\StorageTypeEnum;
+use Fixprice\Dragoblued\Filestorageclient\Dragoblued\Filestorageclient;
+use Fixprice\Dragoblued\Filestorageclient\Enums\StorageTypeEnum;
 
 $fileStorageClient = new FileStorageClient(StorageTypeEnum::LOCAL, [
-    'attachmentSystemPath' => \Yii::getAlias('@common/upload/')
+    'path' => \Yii::getAlias('@common/upload/')
 ]);
-$fileStorageClient->fileStorage->upload($file->name, $file->tempName);
+$fileStorageClient->upload($file->name, $file->tempName);
+$file = $fileStorageClient->getFile($file->name);
+$file->delete(); //getSize, getContent
 ```
 1. upload: загрузка файла в хранилище.
 2. delete: удаление файла из хранилища.

@@ -39,7 +39,7 @@ class S3FileStorage implements FileStorageInterface
                 'endpoint' => $config['S3_ENDPOINT'] ?: '',
             ]);
         } catch (AwsException $e) {
-            throw new S3StorageException("Error connecting to S3: " . $e->getMessage());
+            throw new S3StorageException("Error connecting to S3: " . $e->getMessage(), 0, $e);
         }
         $this->bucket = $config['S3_BUCKET'];
         $this->rootDirectory = $config['S3_ROOT_DIRECTORY'] ?: '';
