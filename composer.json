@@ -1,6 +1,7 @@
 {
     "name": "dragoblued/filestorageclient",
     "version": "1.0.0",
+
     "autoload": {
         "psr-4": {
             "Dragoblued\\Filestorageclient\\": "src/"
@@ -13,6 +14,7 @@
         }
     ],
     "minimum-stability": "stable",
+    "prefer-stable": true,
     "require": {
         "php": ">=7.4.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
