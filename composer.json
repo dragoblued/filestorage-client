@@ -1,5 +1,6 @@
 {
     "name": "dragoblued/filestorageclient",
+    "version": "1.0.3",
     "autoload": {
         "psr-4": {
             "Dragoblued\\Filestorageclient\\": "src/"

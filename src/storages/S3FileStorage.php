@@ -23,6 +23,8 @@ class S3FileStorage implements FileStorageInterface
     private string $bucket;
     private string $rootDirectory;
 
+    const ACL_DEFAULT = 'public-read';
+
     /**
      * @param array $config
      */
@@ -46,7 +48,6 @@ class S3FileStorage implements FileStorageInterface
         $this->awsS3Adapter = new AwsS3Adapter($this->s3Client, $this->bucket, [
             'directory' => $this->rootDirectory,
             'create' => true,
-            'acl' => 'public-read'
         ]);
         $this->filesystem = new Filesystem($this->awsS3Adapter);
     }
@@ -54,13 +55,20 @@ class S3FileStorage implements FileStorageInterface
     /**
      * @param string $name
      * @param string $tmpName
+     * @param array  $options
      *
      * @return void
      */
-    public function upload(string $name, string $tmpName): void
+    public function upload(string $name, string $tmpName, array $options = []): void
     {
         try {
-            $this->filesystem->write($name, file_get_contents($tmpName));
+            $fileContent = file_get_contents($tmpName);
+            $this->s3Client->putObject(array_merge([
+                'Bucket' => $this->bucket,
+                'Key' => "{$this->rootDirectory}/{$name}",
+                'Body' => $fileContent,
+                'ACL' => $options['ACL'] ?? self::ACL_DEFAULT,
+            ], $options));
         } catch (Throwable $e) {
             throw new S3StorageException('Error uploading file: ' . $name . ' ' . $e->getMessage(), 0, $e);
         }
@@ -116,6 +124,66 @@ class S3FileStorage implements FileStorageInterface
             }
         } catch (Throwable $e) {
             throw new S3StorageException('Error cleanup bucket: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param string $acl
+     *
+     * @return void
+     */
+    public function changeFileAcl(string $key, string $acl): void
+    {
+        try {
+            $this->s3Client->putObjectAcl([
+                'Bucket' => $this->bucket,
+                'Key' => "{$this->rootDirectory}/{$key}",
+                'ACL' => $acl,
+            ]);
+        } catch (Throwable $e) {
+            throw new S3StorageException('Error changing ACL for file: ' . $key . ' ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * @param string $sourceKey
+     * @param string $destinationKey
+     * @param array  $options
+     *
+     * @return void
+     */
+    public function copy(string $sourceKey, string $destinationKey, array $options = []): void
+    {
+        try {
+            $this->s3Client->copyObject(array_merge([
+                'Bucket' => $this->bucket,
+                'CopySource' => "{$this->bucket}/{$this->rootDirectory}/{$sourceKey}",
+                'Key' => "{$this->rootDirectory}/{$destinationKey}",
+                'ACL' => $options['ACL'] ?? self::ACL_DEFAULT,
+                'MetadataDirective' => 'REPLACE',
+            ], $options));
+        } catch (Throwable $e) {
+            throw new S3StorageException('Error copying file: ' . $sourceKey . ' to ' . $destinationKey . ' ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return resource
+     */
+    public function getStream(string $key)
+    {
+        try {
+            $result = $this->s3Client->getObject([
+                'Bucket' => $this->bucket,
+                'Key' => "{$this->rootDirectory}/{$key}",
+            ]);
+
+            return $result['Body']->getStream();
+        } catch (Throwable $e) {
+            throw new S3StorageException('Error getting stream for file: ' . $key . ' ' . $e->getMessage(), 0, $e);
         }
     }
 }
