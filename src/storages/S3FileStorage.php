@@ -9,6 +9,7 @@ use Gaufrette\Filesystem;
 use Gaufrette\FilesystemInterface;
 use Dragoblued\Filestorageclient\interfaces\FileStorageInterface;
 use Dragoblued\Filestorageclient\exceptions\S3StorageException;
+use Dragoblued\Filestorageclient\enums\S3AclEnum;
 use Dragoblued\Filestorageclient\File;
 use Throwable;
 
@@ -22,8 +23,6 @@ class S3FileStorage implements FileStorageInterface
     private S3Client $s3Client;
     private string $bucket;
     private string $rootDirectory;
-
-    const ACL_DEFAULT = 'public-read';
 
     /**
      * @param array $config
@@ -67,7 +66,7 @@ class S3FileStorage implements FileStorageInterface
                 'Bucket' => $this->bucket,
                 'Key' => "{$this->rootDirectory}/{$name}",
                 'Body' => $fileContent,
-                'ACL' => $options['ACL'] ?? self::ACL_DEFAULT,
+                'ACL' => $options['ACL'] ?? S3AclEnum::PUBLIC_READ,
             ], $options));
         } catch (Throwable $e) {
             throw new S3StorageException('Error uploading file: ' . $name . ' ' . $e->getMessage(), 0, $e);
@@ -160,7 +159,7 @@ class S3FileStorage implements FileStorageInterface
                 'Bucket' => $this->bucket,
                 'CopySource' => "{$this->bucket}/{$this->rootDirectory}/{$sourceKey}",
                 'Key' => "{$this->rootDirectory}/{$destinationKey}",
-                'ACL' => $options['ACL'] ?? self::ACL_DEFAULT,
+                'ACL' => $options['ACL'] ?? S3AclEnum::PUBLIC_READ,
                 'MetadataDirective' => 'REPLACE',
             ], $options));
         } catch (Throwable $e) {
